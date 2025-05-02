@@ -3,33 +3,33 @@ import { ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const textRef = useRef<HTMLHeadingElement>(null);
-  
+
   useEffect(() => {
     const textElement = textRef.current;
     if (!textElement) return;
-    
+
     const text = textElement.innerText;
     textElement.innerHTML = '';
-    
-    // Add each letter with a delay
+
+    // Add each letter with a delay and preserve spaces
     text.split('').forEach((char, index) => {
       const span = document.createElement('span');
-      span.innerText = char;
+      span.innerText = char === ' ' ? '\u00A0' : char; // Non-breaking space for visible gap
       span.style.opacity = '0';
       span.style.transform = 'translateY(20px)';
       span.style.display = 'inline-block';
       span.style.transition = 'all 0.3s ease';
       span.style.transitionDelay = `${index * 0.05}s`;
-      
+
       setTimeout(() => {
         span.style.opacity = '1';
         span.style.transform = 'translateY(0)';
       }, 100); // Small initial delay before animation starts
-      
+
       textElement.appendChild(span);
     });
   }, []);
-  
+
   return (
     <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900 z-10"></div>
@@ -61,7 +61,7 @@ const Hero: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <a 
         href="#about" 
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce"
