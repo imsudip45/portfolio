@@ -6,6 +6,7 @@ export interface Project {
   imageUrl?: string;
   githubUrl?: string;
   liveUrl?: string;
+  autoPreview?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark';
