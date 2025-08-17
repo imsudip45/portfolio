@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -8,9 +8,25 @@ import Blog from './components/Blog';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ParticleBackground from './components/ParticleBackground';
+import AdminPage from './pages/AdminPage';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 const App: React.FC = () => {
+  const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
+
+  useEffect(() => {
+    // Handle route changes
+    const handlePopState = () => {
+      setCurrentRoute(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   useEffect(() => {
     // Update document title
     document.title = 'Sudip Niroula | Python Developer';
@@ -20,7 +36,7 @@ const App: React.FC = () => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         
-        const targetId = this.getAttribute('href') as string;
+        const targetId = (e.currentTarget as HTMLAnchorElement).getAttribute('href') as string;
         const targetElement = document.querySelector(targetId);
         
         if (targetElement) {
@@ -53,6 +69,15 @@ const App: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Simple routing logic
+  if (currentRoute === '/admin') {
+    return (
+      <ThemeProvider>
+        <AdminPage />
+      </ThemeProvider>
+    );
+  }
   
   return (
     <ThemeProvider>
@@ -70,7 +95,7 @@ const App: React.FC = () => {
         <Footer />
       </div>
       
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{__html: `
         html {
           scroll-behavior: smooth;
         }
@@ -93,7 +118,7 @@ const App: React.FC = () => {
         .fadeInUp {
           animation: fadeInUp 0.5s ease-out forwards;
         }
-      `}</style>
+      `}} />
     </ThemeProvider>
   );
 };

@@ -1,65 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 interface Skill {
   name: string;
-  level: number; // 0-100
+  icon: string;
   category: string;
 }
 
 const skills: Skill[] = [
-  { name: 'Python', level: 95, category: 'Languages' },
-  { name: 'Flask', level: 90, category: 'Frameworks' },
-  { name: 'Django', level: 85, category: 'Frameworks' },
-  { name: 'FastAPI', level: 80, category: 'Frameworks' },
-  { name: 'SQL', level: 85, category: 'Database' },
-  { name: 'Pandas', level: 90, category: 'Data Science' },
-  { name: 'Docker', level: 75, category: 'DevOps' },
-  { name: 'AWS', level: 70, category: 'Cloud' },
-  { name: 'Git', level: 85, category: 'Tools' },
-  { name: 'REST API', level: 90, category: 'Concepts' }
+  { name: 'Python', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg', category: 'Languages' },
+  { name: 'Django', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg', category: 'Frameworks' },
+  { name: 'FastAPI', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg', category: 'Frameworks' },
+  { name: 'SQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg', category: 'Database' },
+  { name: 'Pandas', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg', category: 'Data Science' },
+  { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg', category: 'DevOps' },
+  { name: 'AWS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg', category: 'Cloud' },
+  { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg', category: 'Tools' },
+  { name: 'JavaScript', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg', category: 'Languages' },
+  { name: 'React', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', category: 'Frameworks' },
+  { name: 'Next.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg', category: 'Frameworks' },
+  { name: 'Tailwind CSS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', category: 'Styling' }
 ];
 
 const Skills: React.FC = () => {
-  const skillsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const skillBars = document.querySelectorAll('.skill-bar');
-            skillBars.forEach((bar, index) => {
-              setTimeout(() => {
-                bar.classList.add('animate-skill');
-              }, index * 100);
-            });
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    if (skillsRef.current) {
-      observer.observe(skillsRef.current);
-    }
-
-    return () => {
-      if (skillsRef.current) {
-        observer.unobserve(skillsRef.current);
-      }
-    };
-  }, []);
-
-  // Group skills by category
-  const skillsByCategory = skills.reduce<Record<string, Skill[]>>((acc, skill) => {
-    if (!acc[skill.category]) {
-      acc[skill.category] = [];
-    }
-    acc[skill.category].push(skill);
-    return acc;
-  }, {});
-
   return (
     <section id="skills" className="py-20 bg-slate-50 dark:bg-slate-800">
       <div className="container mx-auto px-4 md:px-6">
@@ -71,46 +33,33 @@ const Skills: React.FC = () => {
           </p>
         </div>
 
-        <div ref={skillsRef} className="space-y-12 max-w-4xl mx-auto">
-          {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-            <div key={category} className="mb-8">
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-6">{category}</h3>
-              <div className="space-y-6">
-                {categorySkills.map((skill) => (
-                  <div key={skill.name} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-800 dark:text-slate-200 font-medium">{skill.name}</span>
-                      <span className="text-slate-600 dark:text-slate-400 text-sm">{skill.level}%</span>
-                    </div>
-                    <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className="skill-bar h-full bg-indigo-600 dark:bg-indigo-400 rounded-full w-0"
-                        style={{ width: '0%' }}
-                        data-width={`${skill.level}%`}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {skills.map((skill) => (
+              <div
+                key={skill.name}
+                className="group flex flex-col items-center p-6 bg-white dark:bg-slate-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <div className="w-16 h-16 mb-4 flex items-center justify-center">
+                  <img
+                    src={skill.icon}
+                    alt={skill.name}
+                    className="w-full h-full object-contain filter group-hover:scale-110 transition-transform duration-300"
+                    onError={(e) => {
+                      // Fallback to a generic icon if the image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iOCIgZmlsbD0iIzY0NzQ4QiIvPgo8dGV4dCB4PSIzMiIgeT0iMzYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj57PC90ZXh0Pgo8L3N2Zz4=';
+                    }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 text-center">
+                  {skill.name}
+                </span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .animate-skill {
-          animation: fillSkill 1s forwards ease-out;
-        }
-        
-        @keyframes fillSkill {
-          0% {
-            width: 0%;
-          }
-          100% {
-            width: attr(data-width);
-          }
-        }
-      `}</style>
     </section>
   );
 };

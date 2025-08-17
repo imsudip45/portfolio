@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { blogPosts } from '../data/blog';
+import React, { useState, useEffect } from 'react';
 import { Clock, Tag, ChevronRight } from 'lucide-react';
+import { BlogPost } from '../types';
 
 const Blog: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+
+  useEffect(() => {
+    // Load blog posts from localStorage
+    const savedBlogs = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+    setBlogPosts(savedBlogs);
+  }, []);
   
   // Get unique tags from all blog posts
   const allTags = [...new Set(blogPosts.flatMap(post => post.tags))];

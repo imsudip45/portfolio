@@ -1,3 +1,5 @@
 import { BlogPost } from '../types';
 
-export const blogPosts: BlogPost[] = [];
+export const blogPosts: BlogPost[] = [
+];
+
