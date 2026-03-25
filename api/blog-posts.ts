@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis';
+import { blogPosts as defaultBlogPosts } from '../src/data/blog';
 
 let redis: Redis | null = null;
 try {
@@ -103,16 +104,21 @@ function normalizeBlogPost(input: unknown, fallbackId?: string): BlogPost | null
 }
 
 async function readAllPosts(): Promise<BlogPost[]> {
-  if (!redis) return [];
+  if (!redis) return defaultBlogPosts as BlogPost[];
   const raw = await redis.get(BLOGS_KEY);
-  if (!raw) return [];
+  if (!raw) {
+    if (defaultBlogPosts.length > 0) {
+      await redis.set(BLOGS_KEY, JSON.stringify(defaultBlogPosts));
+    }
+    return defaultBlogPosts as BlogPost[];
+  }
 
   try {
     const parsed = JSON.parse(raw) as BlogPost[];
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return defaultBlogPosts as BlogPost[];
     return parsed;
   } catch {
-    return [];
+    return defaultBlogPosts as BlogPost[];
   }
 }
 
