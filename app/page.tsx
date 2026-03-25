@@ -19,9 +19,19 @@ interface Project {
   liveUrl?: string
   language: string
   date: string
+  isPrivate?: boolean
 }
 
 const projects: Project[] = [
+  {
+    name: "ScienceSathi",
+    description: "A comprehensive exam preparation platform for Nepal's SEE Class 10 Science. Features data-driven practice across all 19 chapters, timed assessments, personalized gap analysis, and a Gemini-powered AI tutor for simplified explanations.",
+    tags: ["Next.js", "TypeScript", "Tailwind", "Gemini"],
+    liveUrl: "https://sciencesathi.vercel.app/",
+    language: "TypeScript",
+    date: "Mar 2026",
+    isPrivate: true,
+  },
   {
     name: "eKantipur Scraper",
     description: "A web scraper that aggregates and organizes news articles from the eKantipur news portal. Collects headlines, content, and metadata for analysis.",
@@ -46,6 +56,22 @@ const projects: Project[] = [
     github: "https://github.com/imsudip45/rustle",
     language: "Rust",
     date: "Jan 2026",
+  },
+  {
+    name: "Football Score Pro",
+    description: "A comprehensive football match management application built with PySide6 and a clean, modular architecture. Handles live scoring, team management, and match statistics.",
+    tags: ["Python", "PySide6", "Desktop"],
+    language: "Python",
+    date: "2025",
+    isPrivate: true,
+  },
+  {
+    name: "Football Score Lite",
+    description: "Professional football graphics control system for local tournaments. Built with Electron, React, and CasparCG for broadcast-quality live score overlays and match graphics.",
+    tags: ["Electron", "React", "CasparCG"],
+    language: "TypeScript",
+    date: "2025",
+    isPrivate: true,
   },
   {
     name: "Iron Man Game",
@@ -205,9 +231,9 @@ function ProfileCard() {
       </p>
 
       <div className="grid grid-cols-3 gap-2 mb-5">
-        <Stat icon={Code2} label="Projects" value="11+" />
+        <Stat icon={Code2} label="Projects" value="14+" />
         <Stat icon={Database} label="Years" value="3+" />
-        <Stat icon={Globe} label="Tech" value="15+" />
+        <Stat icon={Globe} label="Tech Tools" value="25+" />
       </div>
 
       <div className="flex gap-2">
@@ -305,7 +331,11 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
         <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors duration-200 leading-tight">
           {project.name}
         </h3>
-        <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors duration-200 shrink-0 ml-2" />
+        {project.isPrivate ? (
+          <span className="px-1.5 py-0.5 bg-yellow-500/15 text-yellow-500 text-[9px] rounded font-medium shrink-0 ml-2">Private</span>
+        ) : (
+          <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors duration-200 shrink-0 ml-2" />
+        )}
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed mb-2 flex-1 line-clamp-2">
         {project.description}
@@ -407,7 +437,7 @@ function ProfileCardMobile() {
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="text-center p-2 bg-secondary/30 rounded-lg">
-          <div className="text-lg font-bold text-foreground">11+</div>
+          <div className="text-lg font-bold text-foreground">14+</div>
           <div className="text-[10px] text-muted-foreground uppercase">Projects</div>
         </div>
         <div className="text-center p-2 bg-secondary/30 rounded-lg">
@@ -415,8 +445,8 @@ function ProfileCardMobile() {
           <div className="text-[10px] text-muted-foreground uppercase">Years</div>
         </div>
         <div className="text-center p-2 bg-secondary/30 rounded-lg">
-          <div className="text-lg font-bold text-foreground">15+</div>
-          <div className="text-[10px] text-muted-foreground uppercase">Tech</div>
+          <div className="text-lg font-bold text-foreground">25+</div>
+          <div className="text-[10px] text-muted-foreground uppercase">Tech Tools</div>
         </div>
       </div>
 
@@ -478,7 +508,12 @@ function ProjectsGridMobile({ onSelect }: { onSelect: (p: Project) => void }) {
               <h3 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
                 {project.name}
               </h3>
-              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{project.date}</span>
+              <div className="flex items-center gap-2 shrink-0 ml-2">
+                {project.isPrivate && (
+                  <span className="px-1.5 py-0.5 bg-yellow-500/15 text-yellow-500 text-[9px] rounded font-medium">Private</span>
+                )}
+                <span className="text-[10px] text-muted-foreground">{project.date}</span>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed mb-2">
               {project.description}
