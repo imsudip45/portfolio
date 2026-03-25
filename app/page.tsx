@@ -1,6 +1,7 @@
 "use client"
 
-import { Github, Linkedin, Mail, ExternalLink, MapPin, Code2, Database, Terminal, Globe, BookOpen, Calendar, Clock } from "lucide-react"
+import { useState } from "react"
+import { Github, Linkedin, Mail, ExternalLink, MapPin, Code2, Database, Terminal, Globe, BookOpen, Calendar, Clock, X } from "lucide-react"
 
 const skills = {
   languages: ["Python", "JavaScript", "TypeScript", "Rust", "SQL"],
@@ -10,66 +11,82 @@ const skills = {
   specialties: ["REST APIs", "Web Scraping", "Data Processing", "AI Integrations"],
 }
 
-const projects = [
+interface Project {
+  name: string
+  description: string
+  tags: string[]
+  github: string
+  liveUrl?: string
+  language: string
+}
+
+const projects: Project[] = [
   {
     name: "Thrill Binge",
-    description: "Movie discovery platform with TMDB API integration for browsing and searching films",
-    tags: ["Next.js", "TypeScript", "TMDB API"],
-    link: "https://github.com/imsudip45/ThrillBinge",
-  },
-  {
-    name: "Seabirds Pictures",
-    description: "Photo gallery and portfolio site built with Django backend",
-    tags: ["Django", "Python"],
-    link: "https://github.com/imsudip45/seabirds_pictures",
-  },
-  {
-    name: "Rustle",
-    description: "High-performance CLI tool built in Rust for efficient file management",
-    tags: ["Rust", "CLI"],
-    link: "https://github.com/imsudip45/rustle",
-  },
-  {
-    name: "Labya Compute",
-    description: "Hand gesture recognition system using MediaPipe and Gemini AI",
-    tags: ["Python", "MediaPipe", "Gemini"],
-    link: "https://github.com/imsudip45/labya-compute",
-  },
-  {
-    name: "Iron Man Game",
-    description: "Interactive browser-based game with HTML, CSS and JavaScript",
-    tags: ["HTML", "CSS", "JavaScript"],
-    link: "https://github.com/imsudip45/iron-man-game",
-  },
-  {
-    name: "Search Your Laptop",
-    description: "Desktop search utility for quickly finding files and content",
-    tags: ["Python", "Desktop"],
-    link: "https://github.com/imsudip45/Search-your-laptop",
+    description: "A modern, full-stack movie streaming platform that combines Next.js and Django to deliver a seamless movie browsing experience. Powered by TMDB's extensive movie database, it offers a sleek interface to discover, search, and watch trailers.",
+    tags: ["Next.js", "Django", "TypeScript", "TMDB API"],
+    github: "https://github.com/imsudip45/Thrill-Binge",
+    language: "TypeScript",
   },
   {
     name: "Fingerprint",
-    description: "Planner-driven Gemini AI tutor for kids with voice-first learning",
-    tags: ["FastAPI", "React", "Gemini"],
-    link: "https://fingerprintdemo-681576473497.asia-south1.run.app/",
+    description: "A planner-driven Gemini AI tutor for kids with voice-first learning. Built with FastAPI backend and React frontend, featuring real-time audio streaming, session state management, and an intelligent planner architecture.",
+    tags: ["FastAPI", "React", "Gemini", "AI"],
+    github: "https://github.com/imsudip45/Fingerprint",
+    liveUrl: "https://fingerprintdemo-681576473497.asia-south1.run.app/",
+    language: "TypeScript",
+  },
+  {
+    name: "Rustle",
+    description: "A high-performance search widget built entirely in Rust that lets you instantly find files and launch applications. Designed as a faster, lightweight, and modern alternative to the standard Windows search bar.",
+    tags: ["Rust", "Desktop", "Search"],
+    github: "https://github.com/imsudip45/rustle",
+    language: "Rust",
+  },
+  {
+    name: "Labya Compute",
+    description: "A GPU renting platform built as a college project. Enables users to rent GPU compute resources on-demand with a modern TypeScript-based web interface.",
+    tags: ["TypeScript", "GPU", "Platform"],
+    github: "https://github.com/imsudip45/Labya_compute",
+    language: "TypeScript",
+  },
+  {
+    name: "Iron Man Game",
+    description: "An interactive hand-gesture-controlled game using MediaPipe for real-time hand tracking. Vibe coded with Gemini, deployed as a web app with full browser support.",
+    tags: ["TypeScript", "MediaPipe", "Gemini"],
+    github: "https://github.com/imsudip45/IRON-MAN-GAME-USING-MEDIAPIPE",
+    liveUrl: "https://iron-man-game-using-mediapipe.vercel.app",
+    language: "TypeScript",
+  },
+  {
+    name: "Search Your Laptop",
+    description: "A Django-based web app that allows users to search and compare laptops with precise filtering. Features detailed specifications, price comparison, and a clean UI.",
+    tags: ["Django", "Python", "Web App"],
+    github: "https://github.com/imsudip45/searchyourlaptop",
+    liveUrl: "https://sudipniroula45.pythonanywhere.com/",
+    language: "Python",
   },
   {
     name: "eKantipur Scraper",
-    description: "Web scraper for aggregating news from eKantipur portal",
-    tags: ["Python", "Scraping"],
-    link: "https://github.com/imsudip45/ekantipur-scraper",
+    description: "A web scraper that aggregates and organizes news articles from the eKantipur news portal. Collects headlines, content, and metadata for analysis.",
+    tags: ["Python", "Scraping", "HTML"],
+    github: "https://github.com/imsudip45/ekantipur-scraper",
+    language: "HTML",
   },
   {
     name: "E-Commerce Revision",
-    description: "Educational app for e-commerce concepts and revision",
+    description: "An educational Python app designed for revising e-commerce concepts. Helps students review key topics with an interactive interface.",
     tags: ["Python", "Education"],
-    link: "https://github.com/imsudip45/E-commerce-revision",
+    github: "https://github.com/imsudip45/ecommerce-revision-app",
+    language: "Python",
   },
   {
     name: "MIXDOWS",
-    description: "Windows desktop customization and utility tool",
-    tags: ["Python", "Desktop"],
-    link: "https://github.com/imsudip45/MIXDOWS",
+    description: "An HTML-only website that closely replicates the GUI environments of both Windows and Linux distros. A creative front-end project showcasing pure HTML/CSS skills.",
+    tags: ["HTML", "CSS", "UI Clone"],
+    github: "https://github.com/imsudip45/MIXDOWS",
+    liveUrl: "https://imsudip45.github.io/MIXDOWS/",
+    language: "HTML",
   },
 ]
 
@@ -91,19 +108,18 @@ const socials = [
 ]
 
 export default function Portfolio() {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+
   return (
     <main className="h-screen w-screen overflow-hidden bg-background">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full p-6 gap-6">
-        {/* Left Column - Profile */}
         <section className="w-80 shrink-0 flex flex-col gap-5">
           <ProfileCard />
           <SkillsCard />
         </section>
-
-        {/* Right Column - Projects & Blogs */}
         <section className="flex-1 flex flex-col min-w-0 gap-4 overflow-y-auto scrollbar-thin pr-1">
-          <ProjectsGrid />
+          <ProjectsGrid onSelect={setSelectedProject} />
           <BlogsSection />
         </section>
       </div>
@@ -115,7 +131,7 @@ export default function Portfolio() {
           <SkillsCard />
         </section>
         <section className="flex-1 flex flex-col min-w-0 gap-4 overflow-y-auto scrollbar-thin pr-1">
-          <ProjectsGrid />
+          <ProjectsGrid onSelect={setSelectedProject} />
           <BlogsSection />
         </section>
       </div>
@@ -124,9 +140,13 @@ export default function Portfolio() {
       <div className="flex md:hidden h-full flex-col p-4 overflow-y-auto scrollbar-thin">
         <ProfileCardMobile />
         <SkillsCardMobile />
-        <ProjectsGridMobile />
+        <ProjectsGridMobile onSelect={setSelectedProject} />
         <BlogsSectionMobile />
       </div>
+
+      {selectedProject && (
+        <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
     </main>
   )
 }
@@ -229,7 +249,7 @@ function SkillGroup({ title, skills }: { title: string; skills: string[] }) {
   )
 }
 
-function ProjectsGrid() {
+function ProjectsGrid({ onSelect }: { onSelect: (p: Project) => void }) {
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: "150ms" }}>
       <div className="flex items-center justify-between mb-3">
@@ -241,18 +261,18 @@ function ProjectsGrid() {
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-2.5 content-start">
         {projects.map((project, index) => (
-          <ProjectCard key={project.name} project={project} index={index} />
+          <ProjectCard key={project.name} project={project} index={index} onSelect={onSelect} />
         ))}
       </div>
     </div>
   )
 }
 
-function ProjectCard({ project, index }: { project: typeof projects[0]; index: number }) {
+function ProjectCard({ project, index, onSelect }: { project: Project; index: number; onSelect: (p: Project) => void }) {
   return (
-    <a
-      href={project.link}
-      className="group bg-card rounded-xl border border-border p-4 hover:border-primary/40 transition-all duration-200 flex flex-col animate-scale-in"
+    <button
+      onClick={() => onSelect(project)}
+      className="group bg-card rounded-xl border border-border p-4 hover:border-primary/40 transition-all duration-200 flex flex-col animate-scale-in text-left cursor-pointer"
       style={{ animationDelay: `${150 + index * 30}ms` }}
     >
       <div className="flex items-start justify-between mb-2">
@@ -271,7 +291,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
           </span>
         ))}
       </div>
-    </a>
+    </button>
   )
 }
 
@@ -411,7 +431,7 @@ function SkillsCardMobile() {
   )
 }
 
-function ProjectsGridMobile() {
+function ProjectsGridMobile({ onSelect }: { onSelect: (p: Project) => void }) {
   return (
     <div className="animate-fade-in-up mb-4" style={{ animationDelay: "150ms" }}>
       <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -419,11 +439,11 @@ function ProjectsGridMobile() {
         Projects
       </h2>
       <div className="grid grid-cols-1 gap-3">
-        {projects.map((project, index) => (
-          <a
+        {projects.map((project) => (
+          <button
             key={project.name}
-            href={project.link}
-            className="group bg-card rounded-lg border border-border p-4 hover:border-primary/40 transition-all duration-200"
+            onClick={() => onSelect(project)}
+            className="group bg-card rounded-lg border border-border p-4 hover:border-primary/40 transition-all duration-200 text-left cursor-pointer"
           >
             <div className="flex items-start justify-between mb-2">
               <h3 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
@@ -441,7 +461,7 @@ function ProjectsGridMobile() {
                 </span>
               ))}
             </div>
-          </a>
+          </button>
         ))}
       </div>
     </div>
@@ -488,6 +508,67 @@ function BlogsSectionMobile() {
             </div>
           </a>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className="relative bg-card border border-border rounded-2xl p-6 max-w-lg w-full shadow-2xl animate-scale-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-foreground mb-1">{project.name}</h2>
+          <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded">
+            {project.language}
+          </span>
+        </div>
+
+        <p className="text-sm text-foreground/80 leading-relaxed mb-5">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-1.5 mb-6">
+          {project.tags.map((tag) => (
+            <span key={tag} className="px-2.5 py-1 bg-primary/10 text-primary text-xs rounded-md font-medium">
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex gap-3">
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-secondary/50 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
+          >
+            <Github className="w-4 h-4" />
+            GitHub
+          </a>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary rounded-lg text-sm text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Live Demo
+            </a>
+          )}
+        </div>
       </div>
     </div>
   )
