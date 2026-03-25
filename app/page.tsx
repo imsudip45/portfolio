@@ -7,7 +7,7 @@ const skills = {
   languages: ["Python", "JavaScript", "TypeScript", "Rust", "SQL"],
   frameworks: ["Django", "FastAPI", "Next.js", "React", "Tailwind CSS"],
   tools: ["Docker", "Git", "AWS", "PostgreSQL", "Redis"],
-  aiTools: ["Cursor", "Claude", "Gemini", "v0", "GitHub Copilot", "ChatGPT"],
+  aiTools: ["Gemini ADK", "Gemini CLI", "LangChain", "MediaPipe"],
   specialties: ["REST APIs", "Web Scraping", "Data Processing", "AI Integrations"],
 }
 
