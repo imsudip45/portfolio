@@ -15,18 +15,20 @@ interface Project {
   name: string
   description: string
   tags: string[]
-  github: string
+  github?: string
   liveUrl?: string
   language: string
+  date: string
 }
 
 const projects: Project[] = [
   {
-    name: "Thrill Binge",
-    description: "A modern, full-stack movie streaming platform that combines Next.js and Django to deliver a seamless movie browsing experience. Powered by TMDB's extensive movie database, it offers a sleek interface to discover, search, and watch trailers.",
-    tags: ["Next.js", "Django", "TypeScript", "TMDB API"],
-    github: "https://github.com/imsudip45/Thrill-Binge",
-    language: "TypeScript",
+    name: "eKantipur Scraper",
+    description: "A web scraper that aggregates and organizes news articles from the eKantipur news portal. Collects headlines, content, and metadata for analysis.",
+    tags: ["Python", "Scraping", "HTML"],
+    github: "https://github.com/imsudip45/ekantipur-scraper",
+    language: "HTML",
+    date: "Mar 2026",
   },
   {
     name: "Fingerprint",
@@ -35,6 +37,7 @@ const projects: Project[] = [
     github: "https://github.com/imsudip45/Fingerprint",
     liveUrl: "https://fingerprintdemo-681576473497.asia-south1.run.app/",
     language: "TypeScript",
+    date: "Mar 2026",
   },
   {
     name: "Rustle",
@@ -42,13 +45,7 @@ const projects: Project[] = [
     tags: ["Rust", "Desktop", "Search"],
     github: "https://github.com/imsudip45/rustle",
     language: "Rust",
-  },
-  {
-    name: "Labya Compute",
-    description: "A GPU renting platform built as a college project. Enables users to rent GPU compute resources on-demand with a modern TypeScript-based web interface.",
-    tags: ["TypeScript", "GPU", "Platform"],
-    github: "https://github.com/imsudip45/Labya_compute",
-    language: "TypeScript",
+    date: "Jan 2026",
   },
   {
     name: "Iron Man Game",
@@ -57,21 +54,23 @@ const projects: Project[] = [
     github: "https://github.com/imsudip45/IRON-MAN-GAME-USING-MEDIAPIPE",
     liveUrl: "https://iron-man-game-using-mediapipe.vercel.app",
     language: "TypeScript",
+    date: "Nov 2025",
   },
   {
-    name: "Search Your Laptop",
-    description: "A Django-based web app that allows users to search and compare laptops with precise filtering. Features detailed specifications, price comparison, and a clean UI.",
-    tags: ["Django", "Python", "Web App"],
-    github: "https://github.com/imsudip45/searchyourlaptop",
-    liveUrl: "https://sudipniroula45.pythonanywhere.com/",
-    language: "Python",
+    name: "Labya Compute",
+    description: "A GPU renting platform built as a college project. Enables users to rent GPU compute resources on-demand with a modern TypeScript-based web interface.",
+    tags: ["TypeScript", "GPU", "Platform"],
+    github: "https://github.com/imsudip45/Labya_compute",
+    language: "TypeScript",
+    date: "Aug 2025",
   },
   {
-    name: "eKantipur Scraper",
-    description: "A web scraper that aggregates and organizes news articles from the eKantipur news portal. Collects headlines, content, and metadata for analysis.",
-    tags: ["Python", "Scraping", "HTML"],
-    github: "https://github.com/imsudip45/ekantipur-scraper",
-    language: "HTML",
+    name: "Thrill Binge",
+    description: "A modern, full-stack movie streaming platform that combines Next.js and Django to deliver a seamless movie browsing experience. Powered by TMDB's extensive movie database, it offers a sleek interface to discover, search, and watch trailers.",
+    tags: ["Next.js", "Django", "TypeScript", "TMDB API"],
+    github: "https://github.com/imsudip45/Thrill-Binge",
+    language: "TypeScript",
+    date: "May 2025",
   },
   {
     name: "E-Commerce Revision",
@@ -79,6 +78,7 @@ const projects: Project[] = [
     tags: ["Python", "Education"],
     github: "https://github.com/imsudip45/ecommerce-revision-app",
     language: "Python",
+    date: "Apr 2025",
   },
   {
     name: "MIXDOWS",
@@ -87,6 +87,32 @@ const projects: Project[] = [
     github: "https://github.com/imsudip45/MIXDOWS",
     liveUrl: "https://imsudip45.github.io/MIXDOWS/",
     language: "HTML",
+    date: "Nov 2024",
+  },
+  {
+    name: "Search Your Laptop",
+    description: "A Django-based web app that allows users to search and compare laptops with precise filtering. Features detailed specifications, price comparison, and a clean UI.",
+    tags: ["Django", "Python", "Web App"],
+    github: "https://github.com/imsudip45/searchyourlaptop",
+    liveUrl: "https://sudipniroula45.pythonanywhere.com/",
+    language: "Python",
+    date: "Sep 2024",
+  },
+  {
+    name: "Disease Predicting Systems",
+    description: "A collection of machine learning models for predicting various diseases. Built with Jupyter Notebooks for data analysis, model training, and evaluation.",
+    tags: ["Python", "ML", "Jupyter"],
+    github: "https://github.com/imsudip45/Disease-Predicting-Systems",
+    language: "Jupyter Notebook",
+    date: "Aug 2024",
+  },
+  {
+    name: "Logistic Regression",
+    description: "Implementation of logistic regression algorithms from scratch. Demonstrates classification techniques with real-world datasets in Jupyter Notebooks.",
+    tags: ["Python", "ML", "Jupyter"],
+    github: "https://github.com/imsudip45/Logistic-Regression",
+    language: "Jupyter Notebook",
+    date: "Jul 2024",
   },
 ]
 
@@ -179,7 +205,7 @@ function ProfileCard() {
       </p>
 
       <div className="grid grid-cols-3 gap-2 mb-5">
-        <Stat icon={Code2} label="Projects" value="10+" />
+        <Stat icon={Code2} label="Projects" value="11+" />
         <Stat icon={Database} label="Years" value="3+" />
         <Stat icon={Globe} label="Tech" value="15+" />
       </div>
@@ -281,15 +307,18 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
         </h3>
         <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors duration-200 shrink-0 ml-2" />
       </div>
-      <p className="text-xs text-muted-foreground leading-relaxed mb-3 flex-1 line-clamp-2">
+      <p className="text-xs text-muted-foreground leading-relaxed mb-2 flex-1 line-clamp-2">
         {project.description}
       </p>
-      <div className="flex flex-wrap gap-1">
-        {project.tags.map((tag) => (
-          <span key={tag} className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] rounded font-medium">
-            {tag}
-          </span>
-        ))}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+          {project.tags.slice(0, 2).map((tag) => (
+            <span key={tag} className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] rounded font-medium">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <span className="text-[10px] text-muted-foreground shrink-0">{project.date}</span>
       </div>
     </button>
   )
@@ -378,7 +407,7 @@ function ProfileCardMobile() {
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="text-center p-2 bg-secondary/30 rounded-lg">
-          <div className="text-lg font-bold text-foreground">10+</div>
+          <div className="text-lg font-bold text-foreground">11+</div>
           <div className="text-[10px] text-muted-foreground uppercase">Projects</div>
         </div>
         <div className="text-center p-2 bg-secondary/30 rounded-lg">
@@ -449,7 +478,7 @@ function ProjectsGridMobile({ onSelect }: { onSelect: (p: Project) => void }) {
               <h3 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
                 {project.name}
               </h3>
-              <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/50" />
+              <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{project.date}</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed mb-2">
               {project.description}
@@ -529,10 +558,16 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         </button>
 
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-foreground mb-1">{project.name}</h2>
-          <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded">
-            {project.language}
-          </span>
+          <h2 className="text-xl font-bold text-foreground mb-2">{project.name}</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded">
+              {project.language}
+            </span>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              {project.date}
+            </span>
+          </div>
         </div>
 
         <p className="text-sm text-foreground/80 leading-relaxed mb-5">
@@ -548,15 +583,22 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         </div>
 
         <div className="flex gap-3">
-          <a
-            href={project.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-secondary/50 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
-          >
-            <Github className="w-4 h-4" />
-            GitHub
-          </a>
+          {project.github ? (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-secondary/50 rounded-lg text-sm text-foreground hover:bg-secondary transition-colors"
+            >
+              <Github className="w-4 h-4" />
+              GitHub
+            </a>
+          ) : (
+            <span className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-secondary/30 rounded-lg text-sm text-muted-foreground cursor-not-allowed">
+              <Github className="w-4 h-4" />
+              Private
+            </span>
+          )}
           {project.liveUrl && (
             <a
               href={project.liveUrl}
