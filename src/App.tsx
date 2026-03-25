@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ParticleBackground from './components/ParticleBackground';
 import AdminPage from './pages/AdminPage';
+import BlogPostDetail from './components/BlogPostDetail';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 const App: React.FC = () => {
@@ -75,6 +76,26 @@ const App: React.FC = () => {
     return (
       <ThemeProvider>
         <AdminPage />
+      </ThemeProvider>
+    );
+  }
+
+  if (currentRoute.startsWith('/blog/')) {
+    return (
+      <ThemeProvider>
+        <div className="min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+          <ParticleBackground />
+          <Navbar />
+          <main>
+            <BlogPostDetail />
+          </main>
+          <Footer />
+        </div>
+        <style dangerouslySetInnerHTML={{__html: `
+          html {
+            scroll-behavior: smooth;
+          }
+        `}} />
       </ThemeProvider>
     );
   }

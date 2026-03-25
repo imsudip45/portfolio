@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Tag, ChevronRight } from 'lucide-react';
+import { Clock, ChevronRight } from 'lucide-react';
 import { BlogPost } from '../types';
 
 const Blog: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load blog posts from localStorage
-    const savedBlogs = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-    setBlogPosts(savedBlogs);
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/blog-posts', { method: 'GET', credentials: 'include' });
+        const data: unknown = await res.json().catch(() => null);
+        const posts = (data as { posts?: BlogPost[] } | null)?.posts;
+        setBlogPosts(posts || []);
+      } catch {
+        setBlogPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    void load();
   }, []);
   
   // Get unique tags from all blog posts
@@ -60,7 +72,11 @@ const Blog: React.FC = () => {
           </div>
         )}
         
-        {filteredPosts.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center text-slate-700 dark:text-slate-300">
+            <p>Loading blog posts...</p>
+          </div>
+        ) : filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => (
               <article

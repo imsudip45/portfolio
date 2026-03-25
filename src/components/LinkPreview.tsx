@@ -20,9 +20,6 @@ const FALLBACK_SCREENSHOT_SERVICES = [
   }
 ];
 
-// Fallback image when preview fails
-const DEFAULT_IMAGE = 'https://via.placeholder.com/160x160/1e293b/f8fafc?text=No+Preview';
-
 const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className }) => {
   const [previewData, setPreviewData] = useState<{
     title: string;

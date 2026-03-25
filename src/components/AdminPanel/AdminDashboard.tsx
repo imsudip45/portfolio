@@ -2,13 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { PlusCircle, FileText, Settings, BarChart3 } from 'lucide-react';
 import BlogEditor from './BlogEditor';
 import BlogManager from './BlogManager';
+import ProjectEditor from './ProjectEditor';
+import ProjectManager from './ProjectManager';
+import SkillEditor from './SkillEditor';
+import SkillManager from './SkillManager';
 import { BlogPost } from '../../types';
 
-type AdminView = 'dashboard' | 'create-blog' | 'manage-blogs' | 'settings';
+type AdminView =
+  | 'dashboard'
+  | 'create-blog'
+  | 'manage-blogs'
+  | 'create-project'
+  | 'manage-projects'
+  | 'create-skill'
+  | 'manage-skills'
+  | 'settings';
 
 const AdminDashboard: React.FC = () => {
   const [currentView, setCurrentView] = useState<AdminView>('dashboard');
   const [editingBlog, setEditingBlog] = useState<string | null>(null);
+  const [editingProject, setEditingProject] = useState<string | null>(null);
+  const [editingSkill, setEditingSkill] = useState<string | null>(null);
   const [blogStats, setBlogStats] = useState({
     totalPosts: 0,
     publishedPosts: 0,
@@ -19,35 +33,48 @@ const AdminDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    loadBlogStats();
+    void loadBlogStats();
   }, [currentView]); // Refresh stats when view changes
 
-  const loadBlogStats = () => {
-    const savedBlogs: BlogPost[] = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-    
-    // Calculate unique tags
-    const allTags = savedBlogs.flatMap(blog => blog.tags);
-    const uniqueTags = [...new Set(allTags)];
-    
-    // Calculate average read time
-    const totalReadTime = savedBlogs.reduce((acc, blog) => {
-      const readTimeNumber = parseInt(blog.readTime.replace(/\D/g, '')) || 0;
-      return acc + readTimeNumber;
-    }, 0);
-    const averageReadTime = savedBlogs.length > 0 ? Math.round(totalReadTime / savedBlogs.length) : 0;
-    
-    // Get recent posts (last 3)
-    const sortedBlogs = savedBlogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    const recentPosts = sortedBlogs.slice(0, 3);
-    
-    setBlogStats({
-      totalPosts: savedBlogs.length,
-      publishedPosts: savedBlogs.length, // All saved posts are considered published for now
-      draftPosts: 0, // We'll implement drafts later
-      totalTags: uniqueTags.length,
-      averageReadTime,
-      recentPosts
-    });
+  const loadBlogStats = async () => {
+    try {
+      const res = await fetch('/api/blog-posts', { method: 'GET', credentials: 'include' });
+      const data: unknown = await res.json().catch(() => null);
+      const savedBlogs: BlogPost[] = (data as { posts?: BlogPost[] }).posts || [];
+
+      // Calculate unique tags
+      const allTags = savedBlogs.flatMap(blog => blog.tags);
+      const uniqueTags = [...new Set(allTags)];
+      
+      // Calculate average read time
+      const totalReadTime = savedBlogs.reduce((acc, blog) => {
+        const readTimeNumber = parseInt(blog.readTime.replace(/\D/g, '')) || 0;
+        return acc + readTimeNumber;
+      }, 0);
+      const averageReadTime = savedBlogs.length > 0 ? Math.round(totalReadTime / savedBlogs.length) : 0;
+      
+      // Get recent posts (last 3)
+      const sortedBlogs = [...savedBlogs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const recentPosts = sortedBlogs.slice(0, 3);
+      
+      setBlogStats({
+        totalPosts: savedBlogs.length,
+        publishedPosts: savedBlogs.length, // All saved posts are considered published for now
+        draftPosts: 0, // We'll implement drafts later
+        totalTags: uniqueTags.length,
+        averageReadTime,
+        recentPosts
+      });
+    } catch {
+      setBlogStats({
+        totalPosts: 0,
+        publishedPosts: 0,
+        draftPosts: 0,
+        totalTags: 0,
+        averageReadTime: 0,
+        recentPosts: [],
+      });
+    }
   };
 
   const renderContent = () => {
@@ -59,7 +86,7 @@ const AdminDashboard: React.FC = () => {
             onSave={() => {
               setCurrentView('manage-blogs');
               setEditingBlog(null);
-              loadBlogStats(); // Refresh stats after saving
+              void loadBlogStats(); // Refresh stats after saving
             }}
             onCancel={() => {
               setCurrentView('dashboard');
@@ -74,8 +101,13 @@ const AdminDashboard: React.FC = () => {
               setEditingBlog(blogId);
               setCurrentView('create-blog');
             }}
-            onCreate={() => setCurrentView('create-blog')}
-            onStatsChange={loadBlogStats} // Refresh stats when blogs are deleted
+            onCreate={() => {
+              setEditingBlog(null);
+              setCurrentView('create-blog');
+            }}
+            onStatsChange={() => {
+              void loadBlogStats();
+            }} // Refresh stats when blogs are deleted
           />
         );
       case 'settings':
@@ -85,6 +117,60 @@ const AdminDashboard: React.FC = () => {
             <p className="text-slate-600 dark:text-slate-400">Settings panel coming soon...</p>
           </div>
         );
+      case 'create-project':
+        return (
+          <ProjectEditor
+            projectId={editingProject}
+            onSave={() => {
+              setCurrentView('manage-projects');
+              setEditingProject(null);
+            }}
+            onCancel={() => {
+              setCurrentView('manage-projects');
+              setEditingProject(null);
+            }}
+          />
+        );
+      case 'manage-projects':
+        return (
+          <ProjectManager
+            onEdit={(projectId) => {
+              setEditingProject(projectId);
+              setCurrentView('create-project');
+            }}
+            onCreate={() => {
+              setEditingProject(null);
+              setCurrentView('create-project');
+            }}
+          />
+        );
+      case 'create-skill':
+        return (
+          <SkillEditor
+            skillId={editingSkill}
+            onSave={() => {
+              setCurrentView('manage-skills');
+              setEditingSkill(null);
+            }}
+            onCancel={() => {
+              setCurrentView('manage-skills');
+              setEditingSkill(null);
+            }}
+          />
+        );
+      case 'manage-skills':
+        return (
+          <SkillManager
+            onEdit={(skillId) => {
+              setEditingSkill(skillId);
+              setCurrentView('create-skill');
+            }}
+            onCreate={() => {
+              setEditingSkill(null);
+              setCurrentView('create-skill');
+            }}
+          />
+        );
       default:
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -93,7 +179,10 @@ const AdminDashboard: React.FC = () => {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button
-                  onClick={() => setCurrentView('create-blog')}
+                  onClick={() => {
+                    setEditingBlog(null);
+                    setCurrentView('create-blog');
+                  }}
                   className="w-full flex items-center gap-3 p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   <PlusCircle size={20} />
@@ -105,6 +194,20 @@ const AdminDashboard: React.FC = () => {
                 >
                   <FileText size={20} />
                   Manage Blog Posts
+                </button>
+                <button
+                  onClick={() => setCurrentView('manage-projects')}
+                  className="w-full flex items-center gap-3 p-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                >
+                  <FileText size={20} />
+                  Manage Projects
+                </button>
+                <button
+                  onClick={() => setCurrentView('manage-skills')}
+                  className="w-full flex items-center gap-3 p-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                >
+                  <FileText size={20} />
+                  Manage Skills
                 </button>
               </div>
             </div>
@@ -210,7 +313,10 @@ const AdminDashboard: React.FC = () => {
                 </li>
                 <li>
                   <button
-                    onClick={() => setCurrentView('create-blog')}
+                    onClick={() => {
+                      setEditingBlog(null);
+                      setCurrentView('create-blog');
+                    }}
                     className={`w-full text-left p-3 rounded-lg transition-colors ${
                       currentView === 'create-blog'
                         ? 'bg-indigo-600 text-white'
@@ -232,6 +338,32 @@ const AdminDashboard: React.FC = () => {
                   >
                     <FileText size={20} className="inline mr-3" />
                     Manage Blogs
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setCurrentView('manage-projects')}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      currentView === 'manage-projects'
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <FileText size={20} className="inline mr-3" />
+                    Manage Projects
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setCurrentView('manage-skills')}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      currentView === 'manage-skills'
+                        ? 'bg-indigo-600 text-white'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <FileText size={20} className="inline mr-3" />
+                    Manage Skills
                   </button>
                 </li>
                 <li>

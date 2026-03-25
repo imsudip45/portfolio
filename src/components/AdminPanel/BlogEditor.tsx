@@ -15,6 +15,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
     content: '',
     tags: '',
     imageUrl: '',
+    date: '',
   });
   const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -23,18 +24,23 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
   useEffect(() => {
     if (blogId) {
       // Load existing blog for editing
-      const savedBlogs: BlogPost[] = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-      const existingBlog = savedBlogs.find(blog => blog.id === blogId);
-      
-      if (existingBlog) {
-        setFormData({
-          title: existingBlog.title,
-          excerpt: existingBlog.excerpt,
-          content: existingBlog.content,
-          tags: existingBlog.tags.join(', '),
-          imageUrl: existingBlog.imageUrl || '',
-        });
-      }
+      const load = async () => {
+        const res = await fetch(`/api/blog-posts?id=${encodeURIComponent(blogId)}`, { method: 'GET', credentials: 'include' });
+        const data: unknown = await res.json().catch(() => null);
+        const existingBlog = ((data as { post?: BlogPost } | null)?.post as BlogPost | undefined);
+
+        if (existingBlog) {
+          setFormData({
+            title: existingBlog.title,
+            excerpt: existingBlog.excerpt,
+            content: existingBlog.content,
+            tags: existingBlog.tags.join(', '),
+            imageUrl: existingBlog.imageUrl || '',
+            date: existingBlog.date,
+          });
+        }
+      };
+      void load();
     } else {
       // Reset form for new blog
       setFormData({
@@ -43,6 +49,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
         content: '',
         tags: '',
         imageUrl: '',
+        date: '',
       });
     }
   }, [blogId]);
@@ -52,10 +59,6 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
       ...prev,
       [field]: value
     }));
-  };
-
-  const generateId = () => {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   };
 
   const calculateReadTime = (content: string) => {
@@ -69,10 +72,11 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check file size (limit to 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Check file size (limit to ~250KB)
+    // Note: base64 images can quickly exceed typical serverless payload/storage limits.
+    const maxSize = 250 * 1024;
     if (file.size > maxSize) {
-      alert('Image size should be less than 5MB');
+      alert('Image size should be less than 250KB (base64 storage limit)');
       return;
     }
 
@@ -114,43 +118,42 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
     setIsSaving(true);
 
     try {
-      // Save to local storage for now (in a real app, this would be an API call)
-      const existingBlogs = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-      
+      const tags = formData.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+      const excerpt = formData.excerpt.trim() || formData.content.substring(0, 150) + (formData.content.length > 150 ? '...' : '');
+      const date = blogId ? (formData.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0];
+      const readTime = calculateReadTime(formData.content);
+      const imageUrl = formData.imageUrl.trim() || undefined;
+
+      const basePayload = {
+        id: blogId || undefined,
+        title: formData.title.trim(),
+        excerpt,
+        content: formData.content.trim(),
+        date,
+        readTime,
+        tags,
+        imageUrl,
+      };
+
+      const endpoint = '/api/blog-posts';
       if (blogId) {
-        // Update existing blog
-        const index = existingBlogs.findIndex((blog: BlogPost) => blog.id === blogId);
-        if (index !== -1) {
-          const originalBlog = existingBlogs[index];
-          const updatedBlog: BlogPost = {
-            id: blogId,
-            title: formData.title.trim(),
-            excerpt: formData.excerpt.trim() || formData.content.substring(0, 150) + '...',
-            content: formData.content.trim(),
-            date: originalBlog.date, // Keep original date
-            readTime: calculateReadTime(formData.content),
-            tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-            imageUrl: formData.imageUrl.trim() || undefined,
-          };
-          existingBlogs[index] = updatedBlog;
-        }
+        const res = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ ...basePayload, id: blogId }),
+        });
+        if (!res.ok) throw new Error('Update failed');
       } else {
-        // Add new blog
-        const newBlog: BlogPost = {
-          id: generateId(),
-          title: formData.title.trim(),
-          excerpt: formData.excerpt.trim() || formData.content.substring(0, 150) + '...',
-          content: formData.content.trim(),
-          date: new Date().toISOString().split('T')[0],
-          readTime: calculateReadTime(formData.content),
-          tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-          imageUrl: formData.imageUrl.trim() || undefined,
-        };
-        existingBlogs.push(newBlog);
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ ...basePayload, id: undefined }),
+        });
+        if (!res.ok) throw new Error('Create failed');
       }
 
-      localStorage.setItem('blogPosts', JSON.stringify(existingBlogs));
-      
       // Only reset form when creating new blog, not when editing
       if (!blogId) {
         setFormData({
@@ -159,6 +162,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
           content: '',
           tags: '',
           imageUrl: '',
+          date: '',
         });
       }
 
@@ -317,7 +321,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({ blogId, onSave, onCancel }) => 
                 </div>
               )}
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                You can either paste an image URL or upload an image from your computer (max 5MB)
+                You can either paste an image URL or upload an image from your computer (max ~250KB base64)
               </p>
             </div>
 

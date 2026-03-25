@@ -12,25 +12,45 @@ const BlogManager: React.FC<BlogManagerProps> = ({ onEdit, onCreate, onStatsChan
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    loadBlogs();
+    void loadBlogs();
   }, []);
 
-  const loadBlogs = () => {
-    const savedBlogs = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-    setBlogs(savedBlogs);
+  const loadBlogs = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/blog-posts', { method: 'GET', credentials: 'include' });
+      const data: unknown = await res.json().catch(() => null);
+      const posts = (data as { posts?: BlogPost[] } | null)?.posts;
+      setBlogs(posts || []);
+    } catch {
+      setBlogs([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (blogId: string) => {
+  const handleDelete = async (blogId: string) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
-      const updatedBlogs = blogs.filter(blog => blog.id !== blogId);
-      setBlogs(updatedBlogs);
-      localStorage.setItem('blogPosts', JSON.stringify(updatedBlogs));
-      
-      // Notify parent component to refresh stats
-      if (onStatsChange) {
-        onStatsChange();
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/blog-posts?id=${encodeURIComponent(blogId)}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+
+        if (!res.ok) throw new Error('Delete failed');
+
+        await loadBlogs();
+
+        // Notify parent component to refresh stats
+        if (onStatsChange) onStatsChange();
+      } catch {
+        alert('Failed to delete blog post');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -101,6 +121,11 @@ const BlogManager: React.FC<BlogManagerProps> = ({ onEdit, onCreate, onStatsChan
 
       {/* Blog List */}
       <div className="space-y-4">
+        {isLoading && blogs.length === 0 && (
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-12 shadow-md text-center">
+            <p className="text-slate-600 dark:text-slate-400">Loading blog posts...</p>
+          </div>
+        )}
         {filteredBlogs.length === 0 ? (
           <div className="bg-white dark:bg-slate-800 rounded-lg p-12 shadow-md text-center">
             <Eye size={48} className="mx-auto text-slate-400 mb-4" />

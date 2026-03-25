@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProjectCard from './ProjectCard';
-import { projects } from '../data/projects';
+import { Project } from '../types';
+import { projects as fallbackProjects } from '../data/projects';
 
 const Projects: React.FC = () => {
   const [filter, setFilter] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>(fallbackProjects);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/projects', { method: 'GET' });
+        const data: unknown = await res.json().catch(() => null);
+        const loaded = (data as { projects?: Project[] } | null)?.projects;
+        if (loaded) setProjects(loaded);
+      } catch {
+        setProjects(fallbackProjects);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    void load();
+  }, []);
   
   // Extract unique technologies from all projects
   const allTechnologies = [...new Set(projects.flatMap(project => project.technologies))];
@@ -51,6 +71,11 @@ const Projects: React.FC = () => {
           ))}
         </div>
         
+        {isLoading && projects.length === 0 && (
+          <div className="text-center text-slate-700 dark:text-slate-300">
+            Loading projects...
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {filteredProjects.map((project) => (
             <div key={project.id} className="w-full">

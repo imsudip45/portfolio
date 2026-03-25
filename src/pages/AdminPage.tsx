@@ -1,41 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Lock, User } from 'lucide-react';
 import AdminDashboard from '../components/AdminPanel/AdminDashboard';
 
 const AdminPage: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
 
-  // Simple authentication (in a real app, this would be more secure)
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch('/api/admin/me', { method: 'GET', credentials: 'include' });
+        const data: unknown = await res.json().catch(() => null);
+        setIsAuthenticated(Boolean((data as { authenticated?: boolean } | null)?.authenticated));
+      } catch {
+        setIsAuthenticated(false);
+      }
+    };
+    check();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Simple hardcoded credentials (replace with real authentication)
-    if (credentials.username === 'sudip@45' && credentials.password === 'Iamtheadmin@45') {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(credentials),
+      });
+
+      if (!res.ok) {
+        setError('Invalid credentials');
+        return;
+      }
+
       setIsAuthenticated(true);
-      localStorage.setItem('adminAuth', 'true');
-    } else {
-      setError('Invalid credentials');
+    } catch {
+      setError('Login failed');
     }
   };
 
-  // Check if already logged in
-  React.useEffect(() => {
-    const authStatus = localStorage.getItem('adminAuth');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } finally {
+      setIsAuthenticated(false);
+      setCredentials({ username: '', password: '' });
     }
-  }, []);
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('adminAuth');
-    setCredentials({ username: '', password: '' });
   };
 
-  if (!isAuthenticated) {
+  if (isAuthenticated !== true) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center px-4">
         <div className="max-w-md w-full">
@@ -50,7 +67,12 @@ const AdminPage: React.FC = () => {
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6" aria-busy={isAuthenticated === null}>
+              {isAuthenticated === null && (
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-lg">
+                  Checking session...
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Username
@@ -94,6 +116,7 @@ const AdminPage: React.FC = () => {
               <button
                 type="submit"
                 className="w-full py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors font-medium"
+                disabled={isAuthenticated === null}
               >
                 Sign In
               </button>

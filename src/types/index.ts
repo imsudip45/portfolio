@@ -21,3 +21,10 @@ export interface BlogPost {
   tags: string[];
   imageUrl?: string;
 }
+
+export interface Skill {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+}
