@@ -5,7 +5,7 @@ import { Github, Linkedin, Mail, ExternalLink, MapPin, Code2, Database, Terminal
 
 const skills = {
   languages: ["Python", "JavaScript", "TypeScript", "Rust", "SQL"],
-  frameworks: ["Django", "FastAPI", "Next.js", "React", "Tailwind CSS"],
+  frameworks: ["Django", "FastAPI", "Next.js", "React", "Tailwind CSS", "PySide6", "Electron"],
   tools: ["Docker", "Git", "AWS", "PostgreSQL", "Redis"],
   aiTools: ["Gemini ADK", "Gemini CLI", "LangChain", "MediaPipe"],
   specialties: ["REST APIs", "Web Scraping", "Data Processing", "AI Integrations"],
