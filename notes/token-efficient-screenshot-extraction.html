@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token-Efficient Extraction of Text from Screenshots | Sudip Niroula</title>
+<meta name="description" content="A survey of what's known about getting LLMs to read screenshots cheaply, and where the open questions are.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-header">
+    <h1><a href="../index.html">Sudip Niroula</a></h1>
+    <nav>
+      <a href="../index.html">About</a>
+      <a href="../notes.html" class="active">Notes</a>
+      <a href="../publications.html">Publications</a>
+      <a href="../projects.html">Projects</a>
+    </nav>
+  </header>
+
+  <a class="back-link" href="../notes.html">&larr; Back to notes</a>
+
+  <article>
+    <h1>Token-Efficient Extraction of Text from Screenshots: Where the Research Stands</h1>
+    <p class="post-meta">July 2026 &middot; reading notes</p>
+
+    <p>
+      Every time a vision-capable LLM reads a screenshot, it converts pixels into
+      hundreds or thousands of tokens before it generates a single word, and
+      those image tokens are billed the same as text tokens. That's easy to
+      ignore for a one-off query, but it adds up fast for anything that sends
+      screenshots repeatedly: GUI agents that click, observe, and repeat, or
+      pipelines that extract code and text from images at scale. So I went
+      looking for how cheap you can make this without losing what actually
+      matters in the image. Here's what I found, and the gap I think is worth
+      filling.
+    </p>
+
+    <h3>How providers actually charge for images</h3>
+    <p>
+      This isn't one universal number. OpenAI tiles images into 32×32-pixel
+      patches, with a <code>detail: low</code> mode for a cheaper fixed pass.
+      Anthropic scales roughly with (width × height) / 750, so resizing an
+      image before sending it produces a near-linear savings. Gemini uses
+      discrete <code>media_resolution</code> levels, and for Gemini 3-class
+      models, the cost per level is <em>fixed regardless of the image's actual
+      pixel dimensions</em>, which is a genuinely different mechanism from the
+      other two. A same-sized screenshot has been measured at roughly 2,451
+      tokens on GPT-5.5 versus 6,636 on Claude versus 6,192 on Gemini:
+      a 2.7× spread before generation even starts. Any cost-optimization
+      strategy has to be evaluated against a specific provider's mechanism,
+      because what saves tokens on one may do nothing on another.
+    </p>
+
+    <h3>Three research threads that don't talk to each other</h3>
+
+    <p>
+      <strong>General visual token compression.</strong> A fast-moving line of
+      work (FastV, LLaVA-PruMerge, AIM, SparseVLM) prunes or merges visual
+      tokens inside the model itself, with claimed savings up to ~35× FLOPs.
+      The catch: it's validated almost entirely on VQA and captioning, tasks
+      with soft, semantic correctness. A slightly lossy visual representation
+      rarely changes the final answer there.
+    </p>
+
+    <p>
+      <strong>GUI-agent-specific efficiency.</strong> Because GUI agents send a
+      fresh screenshot every step, cost compounds: one benchmark measured
+      120,000–320,000 tokens for a single multi-step task. This spawned a
+      cluster of 2025–2026 papers: AQuaUI (adaptive quadtrees: coarse tokens
+      for empty regions, fine tokens for text/icons, ~30% fewer tokens at ~99%
+      retained performance), FocusUI, PixelPrune, and STaR-KV (which exploits
+      similarity between consecutive screenshots). All of these are optimized
+      for <em>action accuracy</em> (did the agent click the right thing), a
+      metric with real tolerance for lossy compression.
+    </p>
+
+    <p>
+      <strong>OCR-free and hybrid document understanding.</strong> Donut and
+      Pix2Struct read text directly from pixels without a separate OCR stage.
+      Older, code-specific work (psc2code, CodeSCAN) extracts source code
+      from programming screencasts via classical OCR plus a correction stage,
+      built on the explicit observation that raw OCR on code is unreliable
+      without that correction step. None of this predates the LLM-token-cost
+      framing, so it was never benchmarked against it.
+    </p>
+
+    <h3>The gap</h3>
+    <blockquote>
+      Do the token-reduction techniques validated for VQA and GUI-action tasks
+      preserve enough fidelity for <em>exact</em> code or text extraction, or
+      does extraction need a fundamentally different approach?
+    </blockquote>
+    <p>
+      Nobody has directly tested this. GUI-agent compression papers measure
+      whether a click landed correctly, which tolerates a merged or dropped
+      token. Extracting exact code doesn't: a single lost token can be a
+      dropped character or a wrong indentation level, and there's no existing
+      benchmark measuring that failure mode specifically.
+    </p>
+
+    <p>
+      One small, informal data point from my own side experiment: running
+      plain Tesseract OCR (no LLM, no preprocessing) against 24 synthetic
+      code screenshots gave a 0% exact-match rate and a mean character error
+      rate near 90%. Not a rigorous result on its own, but it's directionally
+      consistent with the psc2code-era finding that naive approaches to this
+      problem fail in specific, measurable ways, and that the space between
+      "naive OCR" and "full-detail VLM call on every image" is exactly where
+      the open cost/accuracy trade-off lives.
+    </p>
+
+    <h3>What I'd want to test next</h3>
+    <p>
+      A benchmark of code and UI-text screenshots with character-exact ground
+      truth, comparing a full-resolution VLM call, provider low-cost modes,
+      an open pruning method like FastV, and a crop-then-OCR-then-LLM-correction
+      hybrid, scored as a Pareto frontier of token cost versus extraction
+      accuracy rather than a single leaderboard number. If you've seen work
+      that already does this, I'd like to know about it.
+    </p>
+
+    <h3>Sources</h3>
+    <ul class="refs">
+      <li><a href="https://arxiv.org/pdf/2412.03248">AIM: Adaptive Inference of Multi-Modal LLMs via Token Merging and Pruning (ICCV 2025)</a></li>
+      <li><a href="https://arxiv.org/html/2502.11501v1">Token Pruning in Multimodal Large Language Models: Are We Solving the Right Problem?</a></li>
+      <li><a href="https://arxiv.org/pdf/2605.19260">AQuaUI: Visual Token Reduction for GUI Agents with Adaptive Quadtrees</a></li>
+      <li><a href="https://arxiv.org/pdf/2601.03928">FocusUI: Efficient UI Grounding via Position-Preserving Visual Token Selection</a></li>
+      <li><a href="https://arxiv.org/pdf/2606.01790">STaR-KV: Spatio-Temporal Adaptive Re-weighting for KV Cache Compression in GUI Vision-Language Models</a></li>
+      <li><a href="https://arxiv.org/pdf/2508.13024">WebMall: A Multi-Shop Benchmark for Evaluating Web Agents (token/cost analysis)</a></li>
+      <li><a href="https://arxiv.org/abs/2111.15664">Donut: OCR-free Document Understanding Transformer</a></li>
+      <li><a href="https://arxiv.org/pdf/2103.11610">psc2code: Denoising Code Extraction from Programming Screencasts</a></li>
+      <li><a href="https://ai.google.dev/gemini-api/docs/media-resolution">Gemini API: Media resolution documentation</a></li>
+      <li><a href="https://blog.roboflow.com/image-token-cost-vlm/">What does it cost to process an image with a vision model? (Roboflow)</a></li>
+    </ul>
+
+  </article>
+
+  <footer>
+    <a href="mailto:sudipniroula5@gmail.com">sudipniroula5@gmail.com</a> &middot; <a href="https://linkedin.com/in/sudipniroula45">linkedin.com/in/sudipniroula45</a>
+  </footer>
+
+</div>
+</body>
+</html>
