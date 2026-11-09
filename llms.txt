@@ -12,12 +12,13 @@ CV: https://www.sudipniroula.com.np/cv.pdf
 ## Experience
 
 - Full Stack Engineer, Nullion Technologies (May 2026 to present). Backend and
-  frontend work on Align Care Hub and Align Care DODD, SaaS products for US
-  home care agencies, and a bookkeeping platform for small businesses.
-  FastAPI, Next.js, PostgreSQL.
+  frontend work on Align Care Hub and Align Care DODD (SaaS for US home care
+  agencies), a bookkeeping platform for small businesses, the Ohio WebCheck
+  fingerprint scheduler, the Zoe's Beer marketplace, and the Cafe 8848
+  ordering app (iOS and Android). FastAPI, Next.js, PostgreSQL, Flutter.
 - Software Engineer, FutureFrame (February 2025 to March 2026). Built Football
-  Score Pro, a PySide6 desktop app for managing match scores, Football Score
-  Lite in Electron, and web graphics for live broadcasts.
+  Score Pro, a PySide6 desktop app for running match broadcasts, and Football
+  Score Lite, an Electron app for live match graphics.
 - Technical Lead (contract, remote), Seabirds Pictures, Lisbon (July to August
   2025). Built web applications with Django REST Framework and Next.js.
 
@@ -48,6 +49,19 @@ CI/CD, Git, LangChain, Gemini API.
   show a picture, give a quiz or read a worksheet the child shares.
 - [Align Care Hub](https://aligncarehub.com/) and Align Care DODD: SaaS for US
   home care agencies (Nullion Technologies).
+- [Ohio WebCheck Scheduler](https://fingerprint.nulliontech.com/): booking
+  system for Ohio BCI and FBI fingerprint background checks across four
+  locations (Nullion Technologies).
+- [Zoe's Beer](https://zoesbeer.com/): craft beer marketplace with inventory
+  management (Nullion Technologies).
+- [Cafe 8848](https://cafe8848pa.com/): ordering and loyalty platform for a
+  coffee shop in Brentwood, Pennsylvania, on iOS and Android (Nullion
+  Technologies).
+- [Football Score Pro](https://github.com/imsudip45/football-score-pro): PySide6 desktop
+  software for running a football match broadcast (FutureFrame).
+- [Football Score Lite](https://github.com/imsudip45/football-score-lite):
+  Electron and Next.js app that pushes live match graphics to OBS over
+  WebSockets (FutureFrame).
 - [LiteRT.js Classifier](https://imsudip45.github.io/litert-image-classifier/):
   in-browser image classification on WebGPU with a GPU versus CPU latency
   benchmark.
