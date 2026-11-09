@@ -58,7 +58,9 @@ CI/CD, Git, LangChain, Gemini API.
   coffee shop in Brentwood, Pennsylvania, on iOS and Android (Nullion
   Technologies).
 - [Football Score Pro](https://github.com/imsudip45/football-score-pro): PySide6 desktop
-  software for running a football match broadcast (FutureFrame).
+  software for running a football match broadcast, with a FastAPI match API
+  that keeps a web match-control dashboard in sync over WebSockets
+  (FutureFrame).
 - [Football Score Lite](https://github.com/imsudip45/football-score-lite):
   Electron and Next.js app that pushes live match graphics to OBS over
   WebSockets (FutureFrame).
