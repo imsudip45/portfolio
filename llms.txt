@@ -11,7 +11,8 @@ CV: https://www.sudipniroula.com.np/cv.pdf
 
 ## Experience
 
-- Full Stack Engineer, Nullion Technologies (May 2026 to present). Backend and
+- Full Stack Engineer, Nullion Technologies, Pittsburgh, Pennsylvania (remote,
+  May 2026 to present). Backend and
   frontend work on Align Care Hub and Align Care DODD (SaaS for US home care
   agencies), a bookkeeping platform for small businesses, the Ohio WebCheck
   fingerprint scheduler, the Zoe's Beer marketplace, and the Cafe 8848
